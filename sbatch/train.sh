@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=test           # 任务名
+#SBATCH --job-name=train           # 任务名
 #SBATCH --nodes=1                   # 这里不用动 多节点脚本请查官方文档
 #SBATCH --ntasks=1                  # 这里不用动 多任务脚本请查官方文档
 #SBATCH --cpus-per-task=8           # 要几块CPU (一般4块就够用了)
@@ -11,7 +11,7 @@
 #SBATCH --error=%x%A.err          # 报错信息写入的文件
 #SBATCH --gres=gpu:1                # 需要几块GPU (同时最多8块)
 #SBATCH -p aquila                   # 有GPU的partition
-#SBATCH --nodelist=agpu7            # 3090
+#SBATCH --nodelist=agpu8            # 3090
 
 module purge                        # 清除所有已加载的模块
 module load anaconda3 cuda/11.1.1               # 加载anaconda (load virtual env for training)
@@ -23,6 +23,6 @@ echo "START"               # 输出起始信息
 source deactivate
 source /gpfsnyu/packages/anaconda3/5.2.0/bin/activate lseg          # 调用 virtual env
 export CUDA_VISIBLE_DEVICES=0
-python -u test_lseg.py --backbone clip_vitl16_384 --eval --dataset ade20k --data-path ../datasets/ \
---weights checkpoints/demo_e200.ckpt --widehead --no-scaleinv
+python -u train_lseg.py --dataset ade20k --data_path ../datasets --batch_size 1 --exp_name lseg_ade20k_l16 \
+--base_lr 0.004 --weight_decay 1e-4 --no-scaleinv --max_epochs 240 --widehead --accumulate_grad_batches 2 --backbone clip_vitl16_384
 echo "FINISH"                       # 输出起始信息

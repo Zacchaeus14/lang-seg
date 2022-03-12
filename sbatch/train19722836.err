@@ -1,0 +1,28 @@
+DeprecationWarning: 'source deactivate' is deprecated. Use 'conda deactivate'.
+/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/pytorch_lightning/utilities/distributed.py:69: UserWarning: ModelCheckpoint(save_last=True, save_top_k=None, monitor=None) is a redundant configuration. You can save the last checkpoint with ModelCheckpoint(save_top_k=None, monitor=None).
+  warnings.warn(*args, **kwargs)
+wandb: ERROR api_key not configured (no-tty). call wandb.login(key=[your_api_key])
+Traceback (most recent call last):
+  File "/gpfsnyu/scratch/yw3642/lang-seg/train_lseg.py", line 7, in <module>
+    do_training(args, LSegModule)
+  File "/gpfsnyu/scratch/yw3642/lang-seg/utils.py", line 43, in do_training
+    wblogger = get_wandb_logger(hparams)
+  File "/gpfsnyu/scratch/yw3642/lang-seg/utils.py", line 190, in get_wandb_logger
+    _ = logger.experiment
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/pytorch_lightning/loggers/base.py", line 41, in experiment
+    return get_experiment() or DummyExperiment()
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/pytorch_lightning/utilities/distributed.py", line 49, in wrapped_fn
+    return fn(*args, **kwargs)
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/pytorch_lightning/loggers/base.py", line 39, in get_experiment
+    return fn(self)
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/pytorch_lightning/loggers/wandb.py", line 169, in experiment
+    self._experiment = wandb.init(**self._wandb_init) if wandb.run is None else wandb.run
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/wandb/sdk/wandb_init.py", line 951, in init
+    wi.setup(kwargs)
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/wandb/sdk/wandb_init.py", line 208, in setup
+    wandb_login._login(
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/wandb/sdk/wandb_login.py", line 284, in _login
+    wlogin.prompt_api_key()
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/wandb/sdk/wandb_login.py", line 219, in prompt_api_key
+    raise UsageError("api_key not configured (no-tty). call " + directive)
+wandb.errors.UsageError: api_key not configured (no-tty). call wandb.login(key=[your_api_key])
