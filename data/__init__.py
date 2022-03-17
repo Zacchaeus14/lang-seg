@@ -10,7 +10,7 @@ import encoding.datasets as enc_ds
 
 encoding_datasets = {
     x: functools.partial(enc_ds.get_dataset, x)
-    for x in ["coco", "ade20k", "pascal_voc", "pascal_aug", "pcontext", "citys"]
+    for x in ["coco", "ade20k", "pascal_voc", "pascal_aug", "pcontext", "citys", "vizwiz"]
 }
 
 
