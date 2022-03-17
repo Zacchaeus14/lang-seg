@@ -69,6 +69,7 @@ class LSegmentationModule(pl.LightningModule):
     def training_step(self, batch, batch_nb):
         if self.dataset == 'vizwiz':
             img, target, question = batch
+            target = target // 255
         else:
             img, target = batch
         with amp.autocast(enabled=self.enabled):
@@ -96,6 +97,7 @@ class LSegmentationModule(pl.LightningModule):
     def validation_step(self, batch, batch_nb):
         if self.dataset == 'vizwiz':
             img, target, question = batch
+            target = target // 255
         else:
             img, target = batch
         if self.dataset == 'vizwiz':
