@@ -184,9 +184,9 @@ class LSeg(BaseModel):
 
         image_features = self.scratch.head1(path_1)
 
-        imshape = image_features.shape
+        imshape = image_features.shape # [1, 512, 240, 240]
         print('image_features shape', imshape)
-        image_features = image_features.permute(0,2,3,1).reshape(-1, self.out_c)
+        image_features = image_features.permute(0,2,3,1).reshape(-1, self.out_c) # [1, 240, 240, 512]
 
         # normalized features
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
