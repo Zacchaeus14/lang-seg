@@ -154,7 +154,7 @@ class LSeg(BaseModel):
             self.block_depth = kwargs['block_depth']
 
         self.scratch.output_conv = head
-
+        # print(self.labels)
         self.text = clip.tokenize(self.labels)    
         
     def forward(self, x, labelset=''):
@@ -181,28 +181,29 @@ class LSeg(BaseModel):
         text = text.to(x.device)
         self.logit_scale = self.logit_scale.to(x.device)
         text_features = self.clip_pretrained.encode_text(text)
+        # print('text_features shape', text_features.shape) # [150, 512]
 
         image_features = self.scratch.head1(path_1)
 
         imshape = image_features.shape # [1, 512, 240, 240]
-        print('image_features shape', imshape)
+        # print('image_features shape', imshape)
         image_features = image_features.permute(0,2,3,1).reshape(-1, self.out_c) # [1, 240, 240, 512]
 
         # normalized features
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
         
-        logits_per_image = self.logit_scale * image_features.half() @ text_features.t()
+        logits_per_image = self.logit_scale * image_features.half() @ text_features.t() # [1, 240, 240, 150]
 
-        out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2)
-
+        out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2) # [1, 150, 240, 240]
+        # print('out shape before scratch', out.shape)
         if self.arch_option in [1, 2]:
             for _ in range(self.block_depth - 1):
                 out = self.scratch.head_block(out)
             out = self.scratch.head_block(out, False)
 
-        out = self.scratch.output_conv(out)
-
+        out = self.scratch.output_conv(out) # [1, 150, 480, 480]
+        # print('out shape after scratch', out.shape)
         return out
 
 

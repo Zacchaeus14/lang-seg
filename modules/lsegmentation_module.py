@@ -42,6 +42,8 @@ class LSegmentationModule(pl.LightningModule):
 
     def evaluate(self, x, target=None):
         pred = self.net.forward(x)
+        # print('pred shape', pred.shape)
+        # print('target shape', target.shape)
         if isinstance(pred, (tuple, list)):
             pred = pred[0]
         if target is None:
@@ -53,6 +55,7 @@ class LSegmentationModule(pl.LightningModule):
 
     def evaluate_random(self, x, labelset, target=None):
         pred = self.net.forward(x, labelset)
+        # print('pred shape', pred.shape)
         if isinstance(pred, (tuple, list)):
             pred = pred[0]
         if target is None:
@@ -64,9 +67,16 @@ class LSegmentationModule(pl.LightningModule):
     
 
     def training_step(self, batch, batch_nb):
-        img, target = batch
+        if self.dataset == 'vizwiz':
+            img, target, question = batch
+        else:
+            img, target = batch
         with amp.autocast(enabled=self.enabled):
-            out = self(img)
+            if self.dataset == 'vizwiz':
+                out = self(img, labelset=[question, 'other'])
+            else:
+                out = self(img)
+            print('out shape', out.shape, '; target shape', target.shape)
             multi_loss = isinstance(out, tuple)
             if multi_loss:
                 loss = self.criterion(*out, target)
@@ -84,8 +94,15 @@ class LSegmentationModule(pl.LightningModule):
         self.log("train_acc_epoch", self.train_accuracy.compute())
 
     def validation_step(self, batch, batch_nb):
-        img, target = batch
-        out = self(img) 
+        if self.dataset == 'vizwiz':
+            img, target, question = batch
+        else:
+            img, target = batch
+        if self.dataset == 'vizwiz':
+            out = self(img, labelset=[question, 'other'])
+        else:
+            out = self(img)
+        print('out shape', out.shape, '; target shape', target.shape)
         multi_loss = isinstance(out, tuple)
         if multi_loss:
             val_loss = self.criterion(*out, target)
@@ -198,7 +215,7 @@ class LSegmentationModule(pl.LightningModule):
         else:
             mode = "train"
 
-        print(mode)
+        print('trainset mode', mode)
         dset = get_dataset(
             dset,
             root=self.data_path,
@@ -222,7 +239,7 @@ class LSegmentationModule(pl.LightningModule):
         else:
             mode = "val"
 
-        print(mode)
+        print('valset mode', mode)
         return get_dataset(
             dset,
             root=self.data_path,

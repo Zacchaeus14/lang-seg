@@ -25,7 +25,7 @@ class LSegModule(LSegmentationModule):
         super(LSegModule, self).__init__(
             data_path, dataset, batch_size, base_lr, max_epochs, **kwargs
         )
-
+        self.dataset = dataset
         if dataset == "citys":
             self.base_size = 2048
             self.crop_size = 768
@@ -71,7 +71,10 @@ class LSegModule(LSegmentationModule):
         )
         # print(kwargs)
 
-        labels = self.get_labels('ade20k')
+        if dataset != 'vizwiz':
+            labels = self.get_labels(dataset)
+        else:
+            labels = []
 
         self.net = LSegNet(
             labels=labels,
