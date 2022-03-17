@@ -1,0 +1,67 @@
+DeprecationWarning: 'source deactivate' is deprecated. Use 'conda deactivate'.
+/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/pytorch_lightning/utilities/distributed.py:69: UserWarning: ModelCheckpoint(save_last=True, save_top_k=None, monitor=None) is a redundant configuration. You can save the last checkpoint with ModelCheckpoint(save_top_k=None, monitor=None).
+  warnings.warn(*args, **kwargs)
+Retry attempt failed:
+Traceback (most recent call last):
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/urllib3/connection.py", line 174, in _new_conn
+    conn = connection.create_connection(
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/urllib3/util/connection.py", line 72, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/socket.py", line 954, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+socket.gaierror: [Errno -2] Name or service not known
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/urllib3/connectionpool.py", line 703, in urlopen
+    httplib_response = self._make_request(
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/urllib3/connectionpool.py", line 386, in _make_request
+    self._validate_conn(conn)
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/urllib3/connectionpool.py", line 1040, in _validate_conn
+    conn.connect()
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/urllib3/connection.py", line 358, in connect
+    conn = self._new_conn()
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/urllib3/connection.py", line 186, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPSConnection object at 0x7fb2fb1aba90>: Failed to establish a new connection: [Errno -2] Name or service not known
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/requests/adapters.py", line 440, in send
+    resp = conn.urlopen(
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/urllib3/connectionpool.py", line 785, in urlopen
+    retries = retries.increment(
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/urllib3/util/retry.py", line 592, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='api.wandb.ai', port=443): Max retries exceeded with url: /graphql (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7fb2fb1aba90>: Failed to establish a new connection: [Errno -2] Name or service not known'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/wandb/sdk/lib/retry.py", line 102, in __call__
+    result = self._call_fn(*args, **kwargs)
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/wandb/sdk/internal/internal_api.py", line 140, in execute
+    return self.client.execute(*args, **kwargs)
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/wandb/vendor/gql-0.2.0/wandb_gql/client.py", line 52, in execute
+    result = self._get_result(document, *args, **kwargs)
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/wandb/vendor/gql-0.2.0/wandb_gql/client.py", line 60, in _get_result
+    return self.transport.execute(document, *args, **kwargs)
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/wandb/vendor/gql-0.2.0/wandb_gql/transport/requests.py", line 38, in execute
+    request = requests.post(self.url, **post_args)
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/requests/api.py", line 117, in post
+    return request('post', url, data=data, json=json, **kwargs)
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/requests/api.py", line 61, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/requests/sessions.py", line 529, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/requests/sessions.py", line 645, in send
+    r = adapter.send(request, **kwargs)
+  File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/requests/adapters.py", line 519, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='api.wandb.ai', port=443): Max retries exceeded with url: /graphql (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7fb2fb1aba90>: Failed to establish a new connection: [Errno -2] Name or service not known'))
+wandb: Network error (ConnectionError), entering retry loop.
+wandb: W&B API key is configured (use `wandb login --relogin` to force relogin)
+wandb: Network error (ConnectionError), entering retry loop.
+slurmstepd: error: *** JOB 19722905 ON agpu7 CANCELLED AT 2022-03-13T23:52:42 ***
