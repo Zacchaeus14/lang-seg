@@ -70,11 +70,14 @@ class LSegmentationModule(pl.LightningModule):
         if self.dataset == 'vizwiz':
             img, target, question = batch
             target = target // 255
+            print('forwarding viwiz')
+            print('question', question)
+            print('target', target)
         else:
             img, target = batch
         with amp.autocast(enabled=self.enabled):
             if self.dataset == 'vizwiz':
-                out = self(img, labelset=[question, 'other'])
+                out = self(img, labelset=['other', question])
             else:
                 out = self(img)
             print('out shape', out.shape, '; target shape', target.shape)
@@ -101,7 +104,7 @@ class LSegmentationModule(pl.LightningModule):
         else:
             img, target = batch
         if self.dataset == 'vizwiz':
-            out = self(img, labelset=[question, 'other'])
+            out = self(img, labelset=['other', question])
         else:
             out = self(img)
         print('out shape', out.shape, '; target shape', target.shape)
