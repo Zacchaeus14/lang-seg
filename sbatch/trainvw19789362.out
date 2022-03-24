@@ -1,4 +1,4 @@
-Thu Mar 24 04:42:58 2022       
+Thu Mar 24 04:48:10 2022       
 +-----------------------------------------------------------------------------+
 | NVIDIA-SMI 460.73.01    Driver Version: 460.73.01    CUDA Version: 11.2     |
 |-------------------------------+----------------------+----------------------+
@@ -7,7 +7,7 @@ Thu Mar 24 04:42:58 2022
 |                               |                      |               MIG M. |
 |===============================+======================+======================|
 |   0  A10                 On   | 00000000:41:00.0 Off |                    0 |
-|  0%   28C    P8    15W / 150W |      0MiB / 22731MiB |      0%      Default |
+|  0%   29C    P8    21W / 150W |      0MiB / 22731MiB |      1%      Default |
 |                               |                      |                  N/A |
 +-------------------------------+----------------------+----------------------+
                                                                                
@@ -32,5 +32,6 @@ len(img_paths): 6494
 valset mode val
 Resuming checkpoint None, exp_version=None
 Found output scratch
-Validation sanity check: 0it [00:00, ?it/s]Validation sanity check:   0% 0/2 [00:00<?, ?it/s]
+Validation sanity check: 0it [00:00, ?it/s]Validation sanity check:   0% 0/2 [00:00<?, ?it/s]['other', ('What is on this screen?',)]
+
 FINISH

@@ -100,7 +100,7 @@ Traceback (most recent call last):
     return self.net(x, labelset=labelset)
   File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
     return forward_call(*input, **kwargs)
-  File "/gpfsnyu/scratch/yw3642/lang-seg/modules/models/lseg_net.py", line 164, in forward
+  File "/gpfsnyu/scratch/yw3642/lang-seg/modules/models/lseg_net.py", line 165, in forward
     text = clip.tokenize(labelset)
   File "/gpfsnyu/home/yw3642/.conda/envs/lseg/lib/python3.9/site-packages/clip/clip.py", line 219, in tokenize
     all_tokens = [[sot_token] + _tokenizer.encode(text) + [eot_token] for text in texts]
@@ -116,5 +116,5 @@ AttributeError: 'tuple' object has no attribute 'find'
 wandb: Waiting for W&B process to finish... (failed 1).
 wandb: - 0.000 MB of 0.000 MB uploaded (0.000 MB deduped)wandb: \ 0.000 MB of 0.000 MB uploaded (0.000 MB deduped)wandb:                                                                                
 wandb: You can sync this run to the cloud by running:
-wandb: wandb sync checkpoints/wandb/offline-run-20220324_044435-c10cgcjt
-wandb: Find logs at: checkpoints/wandb/offline-run-20220324_044435-c10cgcjt/logs
+wandb: wandb sync checkpoints/wandb/offline-run-20220324_044857-c10cgcjt
+wandb: Find logs at: checkpoints/wandb/offline-run-20220324_044857-c10cgcjt/logs
