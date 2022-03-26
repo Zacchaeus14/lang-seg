@@ -29,6 +29,9 @@ class LSegModule(LSegmentationModule):
         if dataset == "citys":
             self.base_size = 2048
             self.crop_size = 768
+        elif dataset == "vizwiz":
+            self.base_size = 640
+            self.crop_size = 512
         else:
             self.base_size = 520
             self.crop_size = 480

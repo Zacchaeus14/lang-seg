@@ -161,6 +161,7 @@ class LSeg(BaseModel):
         if labelset == '':
             text = self.text
         else:
+            # print(labelset)
             text = clip.tokenize(labelset)    
         
         if self.channels_last == True:

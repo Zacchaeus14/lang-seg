@@ -37,8 +37,8 @@ class LSegmentationModule(pl.LightningModule):
         self.enabled = False #True mixed precision will make things complicated and leading to NAN error
         self.scaler = amp.GradScaler(enabled=self.enabled)
 
-    def forward(self, x):
-        return self.net(x)
+    def forward(self, x, labelset=''):
+        return self.net(x, labelset=labelset)
 
     def evaluate(self, x, target=None):
         pred = self.net.forward(x)
@@ -69,9 +69,10 @@ class LSegmentationModule(pl.LightningModule):
     def training_step(self, batch, batch_nb):
         if self.dataset == 'vizwiz':
             img, target, question = batch
-            print('forwarding viwiz')
-            print('question', question)
-            print('target', target)
+            question = question[0]
+            # print('forwarding viwiz')
+            # print('question', question)
+            # print('target', target)
         else:
             img, target = batch
         with amp.autocast(enabled=self.enabled):
@@ -79,7 +80,7 @@ class LSegmentationModule(pl.LightningModule):
                 out = self(img, labelset=['other', question])
             else:
                 out = self(img)
-            print('out shape', out.shape, '; target shape', target.shape)
+            # print('out shape', out.shape, '; target shape', target.shape)
             multi_loss = isinstance(out, tuple)
             if multi_loss:
                 loss = self.criterion(*out, target)
@@ -99,13 +100,17 @@ class LSegmentationModule(pl.LightningModule):
     def validation_step(self, batch, batch_nb):
         if self.dataset == 'vizwiz':
             img, target, question = batch
+            question = question[0]
+            # print('forwarding viwiz')
+            # print('question', question)
+            # print('target', target)
         else:
             img, target = batch
         if self.dataset == 'vizwiz':
             out = self(img, labelset=['other', question])
         else:
             out = self(img)
-        print('out shape', out.shape, '; target shape', target.shape)
+        # print('out shape', out.shape, '; target shape', target.shape)
         multi_loss = isinstance(out, tuple)
         if multi_loss:
             val_loss = self.criterion(*out, target)
