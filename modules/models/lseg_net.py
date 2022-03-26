@@ -193,8 +193,14 @@ class LSeg(BaseModel):
         # normalized features
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
-        
-        logits_per_image = self.logit_scale * image_features.half() @ text_features.t() # [1, 240, 240, 150]
+
+        # print('logit scale type:', self.logit_scale.dtype)
+        # print('img ft type:', image_features.dtype)
+        # print('txt ft type:', text_features.dtype)
+        if torch.cuda.is_available():
+            logits_per_image = self.logit_scale * image_features.half() @ text_features.t() # [1, 240, 240, 150]
+        else:
+            logits_per_image = self.logit_scale * image_features @ text_features.t()  # [1, 240, 240, 150]
 
         out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2) # [1, 150, 240, 240]
         # print('out shape before scratch', out.shape)

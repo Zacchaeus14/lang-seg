@@ -222,9 +222,15 @@ def _make_pretrained_clip_vitl16_384(
     pretrained, use_readout="ignore", hooks=None, enable_attention_hooks=False
 ):
     try:
-        clip_pretrained, _ = clip.load("checkpoints/ViT-B-32.pt", device='cuda', jit=False)
+        if torch.cuda.is_available():
+            clip_pretrained, _ = clip.load("checkpoints/ViT-B-32.pt", device='cuda', jit=False)
+        else:
+            clip_pretrained, _ = clip.load("checkpoints/ViT-B-32.pt", device='cpu', jit=False)
     except:
-        clip_pretrained, _ = clip.load("ViT-B/32", device='cuda', jit=False)
+        if torch.cuda.is_available():
+            clip_pretrained, _ = clip.load("ViT-B/32", device='cuda', jit=False)
+        else:
+            clip_pretrained, _ = clip.load("ViT-B/32", device='cpu', jit=False)
     model = timm.create_model("vit_large_patch16_384", pretrained=pretrained)
 
     hooks = [5, 11, 17, 23] if hooks == None else hooks
@@ -260,7 +266,10 @@ def _make_pretrained_clipRN50x16_vitl16_384(
 
 
 def _make_pretrained_clip_vitb32_384(pretrained, use_readout="ignore", hooks=None, enable_attention_hooks=False):
-    clip_pretrained, _ = clip.load("ViT-B/32", device='cuda', jit=False)
+    if torch.cuda.is_available():
+        clip_pretrained, _ = clip.load("ViT-B/32", device='cuda', jit=False)
+    else:
+        clip_pretrained, _ = clip.load("ViT-B/32", device='cpu', jit=False)
     model = timm.create_model("vit_base_patch32_384", pretrained=pretrained)
 
     hooks = [2, 5, 8, 11] if hooks == None else hooks

@@ -49,20 +49,21 @@ import torchvision.transforms as transforms
 
 def get_new_pallete(num_cls):
     n = num_cls
-    pallete = [0]*(n*3)
-    for j in range(0,n):
-            lab = j
-            pallete[j*3+0] = 0
-            pallete[j*3+1] = 0
-            pallete[j*3+2] = 0
-            i = 0
-            while (lab > 0):
-                    pallete[j*3+0] |= (((lab >> 0) & 1) << (7-i))
-                    pallete[j*3+1] |= (((lab >> 1) & 1) << (7-i))
-                    pallete[j*3+2] |= (((lab >> 2) & 1) << (7-i))
-                    i = i + 1
-                    lab >>= 3
+    pallete = [0] * (n * 3)
+    for j in range(0, n):
+        lab = j
+        pallete[j * 3 + 0] = 0
+        pallete[j * 3 + 1] = 0
+        pallete[j * 3 + 2] = 0
+        i = 0
+        while (lab > 0):
+            pallete[j * 3 + 0] |= (((lab >> 0) & 1) << (7 - i))
+            pallete[j * 3 + 1] |= (((lab >> 1) & 1) << (7 - i))
+            pallete[j * 3 + 2] |= (((lab >> 2) & 1) << (7 - i))
+            i = i + 1
+            lab >>= 3
     return pallete
+
 
 def get_new_mask_pallete(npimg, new_palette, out_label_flag=False, labels=None):
     """Get image color pallete for visualizing masks"""
@@ -78,10 +79,12 @@ def get_new_mask_pallete(npimg, new_palette, out_label_flag=False, labels=None):
         patches = []
         for i, index in enumerate(u_index):
             label = labels[index]
-            cur_color = [new_palette[index * 3] / 255.0, new_palette[index * 3 + 1] / 255.0, new_palette[index * 3 + 2] / 255.0]
+            cur_color = [new_palette[index * 3] / 255.0, new_palette[index * 3 + 1] / 255.0,
+                         new_palette[index * 3 + 2] / 255.0]
             red_patch = mpatches.Patch(color=cur_color, label=label)
             patches.append(red_patch)
     return out_img, patches
+
 
 @st.cache(allow_output_mutation=True)
 def load_model():
@@ -225,14 +228,14 @@ def load_model():
                 default=-1,
                 help="numeric value of ignore label in gt",
             )
-            
+
             parser.add_argument(
                 "--label_src",
                 type=str,
                 default="default",
                 help="how to get the labels",
             )
-            
+
             parser.add_argument(
                 "--arch_option",
                 type=int,
@@ -257,7 +260,7 @@ def load_model():
             self.parser = parser
 
         def parse(self):
-            args = self.parser.parse_args(args=[]) 
+            args = self.parser.parse_args(args=[])
             args.cuda = not args.no_cuda and torch.cuda.is_available()
             print(args)
             return args
@@ -265,14 +268,14 @@ def load_model():
     args = Options().parse()
 
     torch.manual_seed(args.seed)
-    args.test_batch_size = 1 
-    alpha=0.5
-        
+    args.test_batch_size = 1
+    alpha = 0.5
+
     args.scale_inv = False
     args.widehead = True
-    args.dataset = 'ade20k'
+    args.dataset = 'vizwiz'
     args.backbone = 'clip_vitl16_384'
-    args.weights = 'checkpoints/demo_e200.ckpt'
+    args.weights = 'checkpoints/result-epoch=10-val_acc_epoch=0.83.ckpt'
     args.ignore_index = 255
 
     module = LSegModule.load_from_checkpoint(
@@ -313,14 +316,14 @@ def load_model():
         model = module.net
     else:
         model = module
-        
+
     model = model.eval()
     model = model.cpu()
     scales = (
         [0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25]
         if args.dataset == "citys"
         else [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
-    )  
+    )
 
     model.mean = [0.5, 0.5, 0.5]
     model.std = [0.5, 0.5, 0.5]
@@ -331,16 +334,17 @@ def load_model():
         model, scales=scales, flip=True
     ).cpu()
     evaluator.eval()
-    
+
     transform = transforms.Compose(
-    [
-        transforms.ToTensor(),
-        transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
-        transforms.Resize([360,480]),
-    ]
-)
+        [
+            transforms.ToTensor(),
+            transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+            transforms.Resize([360, 480]),
+        ]
+    )
 
     return evaluator, transform
+
 
 """
 # LSeg Demo
@@ -362,18 +366,18 @@ if uploaded_file is not None:
     with torch.no_grad():
         # outputs = lseg_model.parallel_forward(pimage, labels)
         outputs = lseg_model.forward(pimage, labels)
-        print('output shape:', np.array(outputs).shape) # [bs=1, 3, h, w]
+        print('output shape:', np.array(outputs).shape)  # [bs=1, 3, h, w]
         predicts = [
             torch.max(output, 0)[1].cpu().numpy()
             for output in outputs
         ]
         # predicts = torch.max(outputs, 1).cpu().numpy()
         print('predict shape:', np.array(predicts).shape)
-        
-    image = pimage[0].permute(1,2,0)
+
+    image = pimage[0].permute(1, 2, 0)
     image = image * 0.5 + 0.5
-    image = Image.fromarray(np.uint8(255*image)).convert("RGBA")
-    
+    image = Image.fromarray(np.uint8(255 * image)).convert("RGBA")
+
     pred = predicts[0]
     print('pred shape:', np.array(pred).shape)
     new_palette = get_new_pallete(len(labels))
@@ -389,10 +393,8 @@ if uploaded_file is not None:
     plt.imshow(seg)
     plt.legend(handles=patches, loc='upper right', bbox_to_anchor=(1.3, 1), prop={'size': 5})
     plt.axis('off')
-    
+
     plt.tight_layout()
 
-    #st.image([image,seg], width=700, caption=["Input image", "Segmentation"])
+    # st.image([image,seg], width=700, caption=["Input image", "Segmentation"])
     st.pyplot(fig)
-    
-    
