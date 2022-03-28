@@ -301,7 +301,7 @@ for fn, data in tqdm(test_json.items()):
             outputs = lseg_model.parallel_forward(pimage, labels)
         else:
             outputs = lseg_model.forward(pimage, labels)
-        print('output shape:', np.array(outputs).shape)  # [bs=1, 3, h, w]
+        # print('output shape:', np.array(outputs).shape)  # [bs=1, 3, h, w]
         predicts = [
             torch.max(output, 0)[1].cpu().numpy()
             for output in outputs
@@ -320,6 +320,5 @@ for fn, data in tqdm(test_json.items()):
     pred = pred.astype(np.uint8)
     pred[pred==1] = 255
     resized = cv2.resize(pred,(width,height), interpolation = cv2.INTER_NEAREST)
-    print('resized unique:', np.unique(resized))
+    # print('resized unique:', np.unique(resized))
     imageio.imwrite(f"results/{todaystring}/{fn.replace('jpg', 'png')}", resized)
-    break
