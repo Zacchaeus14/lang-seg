@@ -1,62 +1,20 @@
-import streamlit as st
-
-st.set_page_config(layout="wide")
-
 import argparse
 import numpy as np
 
 import torch
-
+import imageio
+from datetime import datetime
 from additional_utils.models import LSeg_MultiEvalModule
 from modules.lseg_module import LSegModule
 
 from PIL import Image
-import matplotlib.pyplot as plt
 from encoding.models.sseg import BaseNet
-import matplotlib.patches as mpatches
 import torchvision.transforms as transforms
+import json
+from tqdm import tqdm
+from pathlib import Path
+import cv2
 
-
-def get_new_pallete(num_cls):
-    n = num_cls
-    pallete = [0] * (n * 3)
-    for j in range(0, n):
-        lab = j
-        pallete[j * 3 + 0] = 0
-        pallete[j * 3 + 1] = 0
-        pallete[j * 3 + 2] = 0
-        i = 0
-        while (lab > 0):
-            pallete[j * 3 + 0] |= (((lab >> 0) & 1) << (7 - i))
-            pallete[j * 3 + 1] |= (((lab >> 1) & 1) << (7 - i))
-            pallete[j * 3 + 2] |= (((lab >> 2) & 1) << (7 - i))
-            i = i + 1
-            lab >>= 3
-    return pallete
-
-
-def get_new_mask_pallete(npimg, new_palette, out_label_flag=False, labels=None):
-    """Get image color pallete for visualizing masks"""
-    # put colormap
-    out_img = Image.fromarray(npimg.squeeze().astype('uint8'))
-    print('out_img shape:', out_img)
-    out_img.putpalette(new_palette)
-
-    if out_label_flag:
-        assert labels is not None
-        u_index = np.unique(npimg)
-        print('u_index:', u_index)
-        patches = []
-        for i, index in enumerate(u_index):
-            label = labels[index]
-            cur_color = [new_palette[index * 3] / 255.0, new_palette[index * 3 + 1] / 255.0,
-                         new_palette[index * 3 + 2] / 255.0]
-            red_patch = mpatches.Patch(color=cur_color, label=label)
-            patches.append(red_patch)
-    return out_img, patches
-
-
-@st.cache(allow_output_mutation=True)
 def load_model():
     class Options:
         def __init__(self):
@@ -298,12 +256,14 @@ def load_model():
 
     model.mean = [0.5, 0.5, 0.5]
     model.std = [0.5, 0.5, 0.5]
-    # evaluator = LSeg_MultiEvalModule(
-    #     model, scales=scales, flip=True
-    # ).cuda()
-    evaluator = LSeg_MultiEvalModule(
-        model, scales=scales, flip=True
-    ).cpu()
+    if torch.cuda.is_available():
+        evaluator = LSeg_MultiEvalModule(
+            model, scales=scales, flip=True
+        ).cuda()
+    else:
+        evaluator = LSeg_MultiEvalModule(
+            model, scales=scales, flip=True
+        ).cpu()
     evaluator.eval()
 
     transform = transforms.Compose(
@@ -321,51 +281,45 @@ def load_model():
 # LSeg Demo
 """
 lseg_model, lseg_transform = load_model()
-uploaded_file = st.file_uploader("Choose an image...")
-input_labels = st.text_input("Input labels", value="dog, grass, other")
-st.write("The labels are", input_labels)
-
-if uploaded_file is not None:
-    image = Image.open(uploaded_file)
+with open('../datasets/VizWizGrounding2022/test_grounding.json', 'r') as f:
+    test_json = json.load(f)
+todaystring = datetime.now().strftime("%Y%m%d-%H%M%S")
+directory = f"results/{todaystring}/"
+print('results will be save to:', directory)
+Path(directory).mkdir(parents=True, exist_ok=True)
+for fn, data in tqdm(test_json.items()):
+    fp = f'../datasets/VizWizGrounding2022/test/{fn}'
+    question = data['question']
+    labels = ['other', question]
+    image = Image.open(fp)
+    width, height = image.size
     pimage = lseg_transform(np.array(image)).unsqueeze(0)
-
-    labels = []
-    for label in input_labels.split(","):
-        labels.append(label.strip())
-    print('labels:', labels)
+    # print('labels:', labels)
 
     with torch.no_grad():
-        # outputs = lseg_model.parallel_forward(pimage, labels)
-        outputs = lseg_model.forward(pimage, labels)
+        if torch.cuda.is_available():
+            outputs = lseg_model.parallel_forward(pimage, labels)
+        else:
+            outputs = lseg_model.forward(pimage, labels)
         print('output shape:', np.array(outputs).shape)  # [bs=1, 3, h, w]
         predicts = [
             torch.max(output, 0)[1].cpu().numpy()
             for output in outputs
         ]
         # predicts = torch.max(outputs, 1).cpu().numpy()
-        print('predict shape:', np.array(predicts).shape)
+        # print('predict shape:', np.array(predicts).shape)
 
     image = pimage[0].permute(1, 2, 0)
     image = image * 0.5 + 0.5
     image = Image.fromarray(np.uint8(255 * image)).convert("RGBA")
 
-    pred = predicts[0]
-    print('pred shape:', np.array(pred).shape)
-    new_palette = get_new_pallete(len(labels))
-    mask, patches = get_new_mask_pallete(pred, new_palette, out_label_flag=True, labels=labels)
-    seg = mask.convert("RGBA")
-
-    fig = plt.figure()
-    plt.subplot(121)
-    plt.imshow(image)
-    plt.axis('off')
-
-    plt.subplot(122)
-    plt.imshow(seg)
-    plt.legend(handles=patches, loc='upper right', bbox_to_anchor=(1.3, 1), prop={'size': 5})
-    plt.axis('off')
-
-    plt.tight_layout()
-
-    # st.image([image,seg], width=700, caption=["Input image", "Segmentation"])
-    st.pyplot(fig)
+    pred = np.array(predicts[0])
+    # print('pred shape:', np.array(pred).shape)
+    # print('pred:', pred)
+    # print('pred unique:', np.unique(pred, return_counts=True))
+    pred = pred.astype(np.uint8)
+    pred[pred==1] = 255
+    resized = cv2.resize(pred,(width,height), interpolation = cv2.INTER_NEAREST)
+    print('resized unique:', np.unique(resized))
+    imageio.imwrite(f"results/{todaystring}/{fn.replace('jpg', 'png')}", resized)
+    break
