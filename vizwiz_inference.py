@@ -7,13 +7,14 @@ from datetime import datetime
 from additional_utils.models import LSeg_MultiEvalModule
 from modules.lseg_module import LSegModule
 
-from PIL import Image
+from PIL import Image, ImageOps
 from encoding.models.sseg import BaseNet
 import torchvision.transforms as transforms
 import json
 from tqdm import tqdm
 from pathlib import Path
 import cv2
+import os
 
 def load_model():
     class Options:
@@ -280,18 +281,22 @@ def load_model():
 """
 # LSeg Demo
 """
+parser = argparse.ArgumentParser()
+parser.add_argument('--split', default='val', choices=['val', 'test'])
+args = parser.parse_args()
 lseg_model, lseg_transform = load_model()
-with open('../datasets/VizWizGrounding2022/test_grounding.json', 'r') as f:
+with open(f'../datasets/VizWizGrounding2022/{args.split}_grounding.json', 'r') as f:
     test_json = json.load(f)
 todaystring = datetime.now().strftime("%Y%m%d-%H%M%S")
-directory = f"results/{todaystring}/"
+directory = f"results/{args.split}/{todaystring}/"
 print('results will be save to:', directory)
 Path(directory).mkdir(parents=True, exist_ok=True)
 for fn, data in tqdm(test_json.items()):
-    fp = f'../datasets/VizWizGrounding2022/test/{fn}'
+    fp = f'../datasets/VizWizGrounding2022/{args.split}/{fn}'
     question = data['question']
     labels = ['other', question]
     image = Image.open(fp)
+    img = ImageOps.exif_transpose(img)
     width, height = image.size
     pimage = lseg_transform(np.array(image)).unsqueeze(0)
     # print('labels:', labels)
@@ -320,5 +325,9 @@ for fn, data in tqdm(test_json.items()):
     pred = pred.astype(np.uint8)
     pred[pred==1] = 255
     resized = cv2.resize(pred,(width,height), interpolation = cv2.INTER_NEAREST)
+
+    # post-processing
+    if np.all(resized==0):
+        resized += 255
     # print('resized unique:', np.unique(resized))
-    imageio.imwrite(f"results/{todaystring}/{fn.replace('jpg', 'png')}", resized)
+    imageio.imwrite(os.path.join(directory, fn.replace('jpg', 'png')), resized)
