@@ -37,7 +37,7 @@ class ViaWizEvaluator:
         self.names = [x.split('/')[-1].split('.')[0] for x in self.result_fps]
         wandb.init(project=args.project_name, entity=args.entity_name,
                    name=args.result_dir.split('/')[-1].replace('/', ''))
-        self.wandb_table = wandb.Table(columns=["name", "image", "question", "iou"])
+        self.wandb_table = wandb.Table(columns=["name", "question", "answer", "prediction", "iou"])
         self.scores = []
 
     def _sanity_check(self):
@@ -59,7 +59,7 @@ class ViaWizEvaluator:
         mask_pred = cv2.imread(os.path.join(self.result_dir, f'{name}.png'))[:, :, 0]
         iou = ViaWizEvaluator.get_iou(mask_gt, mask_pred)
         question = self.annotations.get(f'{name}.jpg', {}).get('question', '')
-
+        answer = self.annotations.get(f'{name}.jpg', {}).get('most_common_answer', '')
         class_labels = {255: "mask"}
         # image_comp = ViaWizEvaluator.compress(image)
         # print(image.shape, image_comp.shape)
@@ -76,7 +76,7 @@ class ViaWizEvaluator:
                 "class_labels": class_labels
             }
         }, caption=question)
-        self.wandb_table.add_data(name, masked_image, question, iou)
+        self.wandb_table.add_data(name, question, answer, masked_image, iou)
         return iou
 
     def evaluate(self):
