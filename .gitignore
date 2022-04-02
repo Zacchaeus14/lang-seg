@@ -134,3 +134,4 @@ logs/
 results/
 *.err
 *.out
+wandb/
