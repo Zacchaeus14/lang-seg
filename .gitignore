@@ -130,5 +130,7 @@ dmypy.json
 checkpoints/
 logs/
 
-# results
+# custom
 results/
+*.err
+*.out

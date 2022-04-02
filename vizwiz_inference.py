@@ -296,16 +296,15 @@ for fn, data in tqdm(test_json.items()):
     question = data['question']
     labels = ['other', question]
     image = Image.open(fp)
-    img = ImageOps.exif_transpose(img)
+    image = ImageOps.exif_transpose(image)
     width, height = image.size
     pimage = lseg_transform(np.array(image)).unsqueeze(0)
+    if torch.cuda.is_available():
+        pimage = pimage.cuda()
     # print('labels:', labels)
 
     with torch.no_grad():
-        if torch.cuda.is_available():
-            outputs = lseg_model.parallel_forward(pimage, labels)
-        else:
-            outputs = lseg_model.forward(pimage, labels)
+        outputs = lseg_model.forward(pimage, labels)
         # print('output shape:', np.array(outputs).shape)  # [bs=1, 3, h, w]
         predicts = [
             torch.max(output, 0)[1].cpu().numpy()
@@ -316,6 +315,7 @@ for fn, data in tqdm(test_json.items()):
 
     image = pimage[0].permute(1, 2, 0)
     image = image * 0.5 + 0.5
+    image = image.cpu()
     image = Image.fromarray(np.uint8(255 * image)).convert("RGBA")
 
     pred = np.array(predicts[0])
