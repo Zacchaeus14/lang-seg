@@ -185,6 +185,7 @@ def get_wandb_logger(hparams):
         name=hparams.exp_name,
         id=hparams.wandb_id,
     )
+    logger.experiment.config.update(hparams.__dict__)
 
     if hparams.wandb_id is None:
         _ = logger.experiment
