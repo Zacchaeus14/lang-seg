@@ -16,3 +16,4 @@ tensorboardX
 matplotlib
 test-tube
 wandb
+git+https://github.com/Zacchaeus14/PyTorch-Encoding.git
