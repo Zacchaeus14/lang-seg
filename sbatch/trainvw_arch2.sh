@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=trainvw           # 任务名
+#SBATCH --job-name=trainvw_arch2           # 任务名
 #SBATCH --nodes=1                   # 这里不用动 多节点脚本请查官方文档
 #SBATCH --ntasks=1                  # 这里不用动 多任务脚本请查官方文档
 #SBATCH --cpus-per-task=16           # 要几块CPU (一般4块就够用了)
