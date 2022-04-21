@@ -89,7 +89,9 @@ class VizWizEvaluator:
         print('DONE EVALUATION')
 
     def log(self):
-        wandb.log({"predictions": self.wandb_table})
+        wandb.log({"predictions": self.wandb_table,
+                   "result_dir": self.result_dir,
+                   "mIOU": np.mean(self.scores)})
 
     @staticmethod
     def compress(image, long_dim=256):
