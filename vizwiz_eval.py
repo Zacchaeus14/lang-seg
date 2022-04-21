@@ -24,7 +24,7 @@ def parse():
     return parser.parse_args()
 
 
-class ViaWizEvaluator:
+class VizWizEvaluator:
     def __init__(self, args):
         self.result_dir = args.result_dir
         self.label_dir = args.label_dir
@@ -57,22 +57,22 @@ class ViaWizEvaluator:
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         mask_gt = cv2.imread(os.path.join(self.label_dir, f'{name}.png'))[:, :, 0]
         mask_pred = cv2.imread(os.path.join(self.result_dir, f'{name}.png'))[:, :, 0]
-        iou = ViaWizEvaluator.get_iou(mask_gt, mask_pred)
+        iou = VizWizEvaluator.get_iou(mask_gt, mask_pred)
         question = self.annotations.get(f'{name}.jpg', {}).get('question', '')
         answer = self.annotations.get(f'{name}.jpg', {}).get('most_common_answer', '')
         class_labels = {255: "mask"}
-        # image_comp = ViaWizEvaluator.compress(image)
+        # image_comp = VizWizEvaluator.compress(image)
         # print(image.shape, image_comp.shape)
         # print(image_comp)
-        # mask_comp = ViaWizEvaluator.compress(mask_pred)
+        # mask_comp = VizWizEvaluator.compress(mask_pred)
         # print(mask_pred.shape, mask_comp.shape)
-        masked_image = wandb.Image(ViaWizEvaluator.compress(image), masks={
+        masked_image = wandb.Image(VizWizEvaluator.compress(image), masks={
             "predictions": {
-                "mask_data": ViaWizEvaluator.compress(mask_pred),
+                "mask_data": VizWizEvaluator.compress(mask_pred),
                 "class_labels": class_labels
             },
             "ground_truth": {
-                "mask_data": ViaWizEvaluator.compress(mask_gt),
+                "mask_data": VizWizEvaluator.compress(mask_gt),
                 "class_labels": class_labels
             }
         }, caption=question)
@@ -113,5 +113,5 @@ class ViaWizEvaluator:
 
 if __name__ == '__main__':
     args = parse()
-    evaluator = ViaWizEvaluator(args)
+    evaluator = VizWizEvaluator(args)
     evaluator.evaluate()
