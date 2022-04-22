@@ -88,6 +88,8 @@ class LSegModule(LSegmentationModule):
 
         self.criterion = self.get_criterion(**kwargs)
 
+        self.unfreeze_text = kwargs.get("unfreeze_text", False)
+
     def get_labels(self, dataset):
         labels = []
         path = 'label_files/{}_objectInfo150.txt'.format(dataset)
