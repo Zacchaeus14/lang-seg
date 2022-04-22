@@ -145,6 +145,10 @@ class LSegmentationModule(pl.LightningModule):
         params_list = [
             {"params": self.net.pretrained.parameters(), "lr": self.base_lr},
         ]
+        if self.unfreeze_text:
+            params_list.append(
+                {"params": self.net.clip_pretrained.parameters(), "lr": self.base_lr}
+            )
         if hasattr(self.net, "scratch"):
             print("Found output scratch")
             params_list.append(

@@ -173,4 +173,11 @@ class LSegModule(LSegmentationModule):
             help="use which activation to activate the block",
         )
 
+        parser.add_argument(
+            "--unfreeze_text",
+            default=False,
+            action="store_true",
+            help="unfreeze text encoder",
+        )
+
         return parser
