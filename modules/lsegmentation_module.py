@@ -330,4 +330,11 @@ class LSegmentationModule(pl.LightningModule):
             help="Use extended augmentations",
         )
 
+        parser.add_argument(
+            "--unfreeze_text",
+            default=False,
+            action="store_true",
+            help="unfreeze text encoder",
+        )
+
         return parser
