@@ -203,8 +203,8 @@ def load_model():
     args.scale_inv = False
     args.widehead = True
     args.dataset = 'vizwiz'
-    args.backbone = 'clip_vitl16_384'
-    args.weights = 'checkpoints/result-epoch=10-val_acc_epoch=0.83.ckpt'
+    # args.backbone = 'clip_vitl16_384'
+    # args.weights = 'checkpoints/result-epoch=10-val_acc_epoch=0.83.ckpt'
     args.ignore_index = 255
     print('dataset:', args.dataset)
     print('weight path:', args.weights)
