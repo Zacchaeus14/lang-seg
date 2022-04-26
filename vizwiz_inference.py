@@ -194,7 +194,7 @@ def load_model():
             self.parser = parser
 
         def parse(self):
-            args = self.parser.parse_args(args=[])
+            args = self.parser.parse_args()
             args.cuda = not args.no_cuda and torch.cuda.is_available()
             print(args)
             return args
