@@ -185,6 +185,11 @@ def load_model():
                 default="lrelu",
                 help="use which activation to activate the block",
             )
+            parser.add_argument(
+                '--split',
+                default='val',
+                choices=['val', 'test']
+            )
 
             self.parser = parser
 
@@ -275,16 +280,13 @@ def load_model():
         ]
     )
 
-    return evaluator, transform
+    return evaluator, transform, args
 
 
 """
 # LSeg Demo
 """
-parser = argparse.ArgumentParser()
-parser.add_argument('--split', default='val', choices=['val', 'test'])
-args = parser.parse_args()
-lseg_model, lseg_transform = load_model()
+lseg_model, lseg_transform, args = load_model()
 with open(f'../datasets/VizWizGrounding2022/{args.split}_grounding.json', 'r') as f:
     test_json = json.load(f)
 todaystring = datetime.now().strftime("%Y%m%d-%H%M%S")
