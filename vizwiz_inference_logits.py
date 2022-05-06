@@ -15,6 +15,7 @@ from tqdm import tqdm
 from pathlib import Path
 import cv2
 import os
+import pickle
 
 def load_model():
     class Options:
@@ -290,9 +291,8 @@ lseg_model, lseg_transform, args = load_model()
 with open(f'../datasets/VizWizGrounding2022/{args.split}_grounding.json', 'r') as f:
     test_json = json.load(f)
 todaystring = datetime.now().strftime("%Y%m%d-%H%M%S")
-directory = f"results/{args.split}/{todaystring}/"
-print('results will be save to:', directory)
-Path(directory).mkdir(parents=True, exist_ok=True)
+print(todaystring)
+results = {}
 for fn, data in tqdm(test_json.items()):
     fp = f'../datasets/VizWizGrounding2022/{args.split}/{fn}'
     question = data['question']
@@ -307,29 +307,34 @@ for fn, data in tqdm(test_json.items()):
 
     with torch.no_grad():
         outputs = lseg_model.forward(pimage, labels)
-        print('output shape:', outputs.cpu().numpy().shape)  # [bs=1, 2, h, w]
+        # print('output shape:', outputs.cpu().numpy().shape)  # [bs=1, 2, h, w]
         predicts = [
-            torch.max(output, 0)[1].cpu().numpy()
+            output[1] - output[0]
             for output in outputs
         ]
         # predicts = torch.max(outputs, 1).cpu().numpy()
         # print('predict shape:', np.array(predicts).shape)
 
-    image = pimage[0].permute(1, 2, 0)
-    image = image * 0.5 + 0.5
-    image = image.cpu()
-    image = Image.fromarray(np.uint8(255 * image)).convert("RGBA")
+    # image = pimage[0].permute(1, 2, 0)
+    # image = image * 0.5 + 0.5
+    # image = image.cpu()
+    # image = Image.fromarray(np.uint8(255 * image)).convert("RGBA")
 
-    pred = np.array(predicts[0])
+    pred = np.array(predicts[0]) # [h, w]
     # print('pred shape:', np.array(pred).shape)
     # print('pred:', pred)
     # print('pred unique:', np.unique(pred, return_counts=True))
-    pred = pred.astype(np.uint8)
-    pred[pred==1] = 255
-    resized = cv2.resize(pred,(width,height), interpolation = cv2.INTER_NEAREST)
+    # pred = pred.astype(np.uint8)
+    # pred[pred==1] = 255
+    # resized = cv2.resize(pred,(width,height), interpolation = cv2.INTER_NEAREST)
+    #
+    # # post-processing
+    # if np.all(resized==0):
+    #     resized += 255
+    # # print('resized unique:', np.unique(resized))
+    # imageio.imwrite(os.path.join(directory, fn.replace('jpg', 'png')), resized)
+    results[fn] = pred
+out_path = f'results/{args.split}/{todaystring}.pkl'
+with open(out_path, 'wb') as f:
+    pickle.dump(results, f)
 
-    # post-processing
-    if np.all(resized==0):
-        resized += 255
-    # print('resized unique:', np.unique(resized))
-    imageio.imwrite(os.path.join(directory, fn.replace('jpg', 'png')), resized)
