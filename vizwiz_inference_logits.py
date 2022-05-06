@@ -320,7 +320,7 @@ for fn, data in tqdm(test_json.items()):
     # image = image.cpu()
     # image = Image.fromarray(np.uint8(255 * image)).convert("RGBA")
 
-    pred = np.array(predicts[0]) # [h, w]
+    pred = predicts[0].cpu().numpy() # [h, w]
     # print('pred shape:', np.array(pred).shape)
     # print('pred:', pred)
     # print('pred unique:', np.unique(pred, return_counts=True))
