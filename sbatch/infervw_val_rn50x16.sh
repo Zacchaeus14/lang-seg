@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=infervw_val           # 任务名
+#SBATCH --job-name=infervw_val_rn50x16           # 任务名
 #SBATCH --nodes=1                   # 这里不用动 多节点脚本请查官方文档
 #SBATCH --ntasks=1                  # 这里不用动 多任务脚本请查官方文档
 #SBATCH --cpus-per-task=16           # 要几块CPU (一般4块就够用了)
@@ -23,5 +23,6 @@ echo "START"               # 输出起始信息
 source deactivate
 source /gpfsnyu/packages/anaconda3/5.2.0/bin/activate lseg          # 调用 virtual env
 export CUDA_VISIBLE_DEVICES=0
-python -u vizwiz_inference.py --split val --weights /gpfsnyu/scratch/yw3642/lang-seg/checkpoints/lseg_vizwiz_l16_640_512_unf_text/version_0/checkpoints/result-epoch=2-val_acc_epoch=0.85.ckpt
+python -u vizwiz_inference.py --split val --weights /gpfsnyu/scratch/yw3642/lang-seg/checkpoints/lseg_vizwiz_l16_640_512_unf_text_rn50x16/version_0/checkpoints/result-epoch=18-val_acc_epoch=0.85.ckpt \
+--backbone clipRN50x16_vitl16_384
 echo "FINISH"                       # 输出起始信息
