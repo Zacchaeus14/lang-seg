@@ -290,7 +290,7 @@ def load_model():
 lseg_model, lseg_transform, args = load_model()
 with open(f'../datasets/VizWizGrounding2022/{args.split}_grounding.json', 'r') as f:
     test_json = json.load(f)
-todaystring = datetime.now().strftime("%Y%m%d-%H%M%S")
+todaystring = datetime.now().strftime("%Y%m%d-%H%M%S") + '-' + args.backbone
 print(todaystring)
 results = {}
 for fn, data in tqdm(test_json.items()):
