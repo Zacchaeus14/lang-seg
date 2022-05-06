@@ -307,7 +307,7 @@ for fn, data in tqdm(test_json.items()):
 
     with torch.no_grad():
         outputs = lseg_model.forward(pimage, labels)
-        # print('output shape:', np.array(outputs).shape)  # [bs=1, 3, h, w]
+        print('output shape:', np.array(outputs).shape)  # [bs=1, 3, h, w]
         predicts = [
             torch.max(output, 0)[1].cpu().numpy()
             for output in outputs
