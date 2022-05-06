@@ -287,11 +287,15 @@ def load_model():
 """
 # LSeg Demo
 """
+def get_uid():
+    import uuid
+    return str(uuid.uuid4())[:4]
+
 lseg_model, lseg_transform, args = load_model()
 with open(f'../datasets/VizWizGrounding2022/{args.split}_grounding.json', 'r') as f:
     test_json = json.load(f)
-todaystring = datetime.now().strftime("%Y%m%d-%H%M%S") + '-' + args.backbone
-print(todaystring)
+uid = f"{args.backbone}-{args.weights.split('/')[-1][:-5]}-{get_uid()}"
+print(uid)
 results = {}
 for fn, data in tqdm(test_json.items()):
     fp = f'../datasets/VizWizGrounding2022/{args.split}/{fn}'
@@ -334,7 +338,7 @@ for fn, data in tqdm(test_json.items()):
     # # print('resized unique:', np.unique(resized))
     # imageio.imwrite(os.path.join(directory, fn.replace('jpg', 'png')), resized)
     results[fn] = pred
-out_path = f'results/{args.split}/{todaystring}.pkl'
+out_path = f'results/{args.split}/{uid}.pkl'
 with open(out_path, 'wb') as f:
     pickle.dump(results, f)
 
