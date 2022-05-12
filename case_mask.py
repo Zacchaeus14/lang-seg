@@ -27,6 +27,8 @@ print(name)
 img = cv2.imread(cfg.img)
 gt = cv2.imread(cfg.gt)[:, :, 0]
 pred = cv2.imread(cfg.pred)[:, :, 0]
+if np.all(pred > 0):
+    pred[:,:] = 0
 iou = get_iou(gt, pred)
 with open(cfg.anno, 'r') as f:
     anno = json.load(f)
