@@ -39,4 +39,5 @@ axarr[0].imshow(img)
 axarr[1].imshow(out_gt)
 axarr[2].imshow(out_pred)
 
+f.tight_layout()
 f.savefig(f'case_analysis/case-{name}.jpg', dpi=400)
